@@ -4,6 +4,8 @@ set -euo pipefail
 ### CONFIG ###
 # the namespace used
 k8s_namespace="moodle-utils-ns"
+# ingress service name
+ingress_service_name="server-service"
 #############
 
 # apply terraform files
