@@ -27,7 +27,7 @@ az aks get-credentials --name $cluster_name --resource-group $cluster_rg_name
 kubectl apply -f ./k8s/00-namespace.yaml
 
 # apply the rest of k8s config files before key vault
-kubectl apply -f ./k8s/1* --overwrite=true -n $k8s_namespace
+cat ./k8s/1* | kubectl apply -f - --overwrite=true -n $k8s_namespace
 
 # install key vault driver to the k8s cluster
 helm install csi csi-secrets-store-provider-azure/csi-secrets-store-provider-azure --namespace $k8s_namespace
@@ -36,7 +36,7 @@ helm install csi csi-secrets-store-provider-azure/csi-secrets-store-provider-azu
 cat ./k8s/20-key-vault.yaml | envsubst | kubectl apply -f - --overwrite=true -n $k8s_namespace
 
 # apply the rest of k8s config files after key vault
-kubectl apply -f ./k8s/3* --overwrite=true -n $k8s_namespace
+cat ./k8s/3* | kubectl apply -f - --overwrite=true -n $k8s_namespace
 
 # wait for deployment to complete
 deployment_name=$(kubectl get deployment -n $k8s_namespace| awk '!/NAME/{print $1}')
