@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: server-cm
+data:
+  PORT: "8080"
+  AUTOSAVE: "10s"
+  SAVEFILE: "/etc/savefile/server.json"
+  LOGFILE: "/etc/logfile/server.log"
+  CONSOLE_LOGLVL: "debug"
+  FILE_LOGLVL: "debug"
+  CERT: "/mnt/secrets/certificate"
+  KEY: "/mnt/secrets/certificate-key"

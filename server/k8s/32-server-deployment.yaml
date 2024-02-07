@@ -1,0 +1,96 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+  labels:
+    app: server
+  namespace: moodle-utils-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          image: krisboorger/moodle-utils:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets"
+              readOnly: true
+            - name: save-file-mount
+              mountPath: "/etc/savefile"
+            - name: log-file-mount
+              mountPath: "/etc/logfile"
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: server-cm
+                  key: PORT
+            - name: AUTOSAVE
+              valueFrom:
+                configMapKeyRef:
+                  name: server-cm
+                  key: AUTOSAVE
+            - name: SAVEFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: server-cm
+                  key: SAVEFILE
+            - name: LOGFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: server-cm
+                  key: LOGFILE
+            - name: CONSOLE_LOGLVL
+              valueFrom:
+                configMapKeyRef:
+                  name: server-cm
+                  key: CONSOLE_LOGLVL
+            - name: FILE_LOGLVL
+              valueFrom:
+                configMapKeyRef:
+                  name: server-cm
+                  key: FILE_LOGLVL
+            - name: CERT
+              valueFrom:
+                configMapKeyRef:
+                  name: server-cm
+                  key: CERT
+            - name: KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: server-cm
+                  key: KEY
+          resources:
+            limits:
+              cpu: 700m
+              memory: 2Gi
+            requests:
+              cpu: 200m
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "azure-secret-provider"
+        - name: save-file-mount
+          persistentVolumeClaim:
+            claimName: save-file-pvc
+        - name: log-file-mount
+          persistentVolumeClaim:
+            claimName: log-file-pvc
