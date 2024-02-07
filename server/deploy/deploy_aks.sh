@@ -45,3 +45,8 @@ fi
 
 # wait until ingress is up
 until kubectl get service/$ingress_service_name --output=jsonpath='{.status.loadBalancer}' -n $k8s_namespace | grep "ingress"; do echo "aaa" ; done
+
+# get external IP to add to DNS
+external_ip=$(kubectl get service/$ingress_service_name --output=jsonpath='{.status.loadBalancer.ingress[0].ip}' -n $k8s_namespace)
+
+echo "The server is ready. Add the following IP to the DNS record: $external_ip"
