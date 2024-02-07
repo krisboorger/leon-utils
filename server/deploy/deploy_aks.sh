@@ -32,3 +32,6 @@ helm install csi csi-secrets-store-provider-azure/csi-secrets-store-provider-azu
 
 # add envvars to key vault config file
 cat ./k8s/20-key-vault.yaml | envsubst | kubectl apply -f - --overwrite=true -n $k8s_namespace
+
+# apply the rest of k8s config files after key vault
+kubectl apply -f ./k8s/3* --overwrite=true -n $k8s_namespace
