@@ -35,3 +35,10 @@ cat ./k8s/20-key-vault.yaml | envsubst | kubectl apply -f - --overwrite=true -n 
 
 # apply the rest of k8s config files after key vault
 kubectl apply -f ./k8s/3* --overwrite=true -n $k8s_namespace
+
+# wait for deployment to complete
+deployment_name=$(kubectl get deployment -n $k8s_namespace| awk '!/NAME/{print $1}')
+kubectl -n $k8s_namespace rollout status deployment/"$deployment_name"
+if [[ "$?" -ne 0 ]]; then
+    exit 1
+fi
